@@ -65,24 +65,26 @@ for key in datas:
         resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
     else:
         try:
-            resp_json_activityuser = requests.post(urlActivity_user, headers=headersClient)
+            resp_json_activityuser = requests.post(urlActivity_user, headers=headersClient, data=filter)
             if (resp_json_activityuser.status_code == 200):
                 resp_json_activityuser = json.loads(resp_json_activityuser.text)
                 datas_activityuser = []
 
+                domain=resp_json_activityuser['sekolah']
 
                 def ambilData_activityuser(key):
                     datas_activityuser.append(
-                        {'id_activity': key['id_activity'], 'tipe_user': key['tipe_user'], 'user_id': key['user_id'],
-                         'aktivitas': key['aktivitas'], 'id_ref_activity': key['id_ref_activity'],
-                         'id_jadwal_pelajaran': key['id_jadwal_pelajaran'], 'datetime': key['datetime'],
-                         'type_activity': key['type_activity'], 'tb_reff': key['tb_reff'], 'id_user': key['id_user'],
-                         'fullname': key['fullname'], 'foto_profile': key['foto_profile'], 'cover': key['cover'],
-                         'level_user': key['level_user'], 'deskripsi': key['deskripsi']})
+                        {'id_activity': str(key['id_activity']), 'tipe_user': str(key['tipe_user']), 'user_id': str(key['user_id']),
+                         'aktivitas': str(key['aktivitas']), 'id_ref_activity': str(key['id_ref_activity']),
+                         'id_jadwal_pelajaran': str(key['id_jadwal_pelajaran']), 'datetime': str(key['datetime']),
+                         'type_activity': str(key['type_activity']), 'tb_reff': str(key['tb_reff']), 'id_user': str(key['id_user']),
+                         'fullname': str(key['fullname']), 'foto_profile': str(key['foto_profile']), 'cover': str(key['cover']),
+                         'level_user': str(key['level_user']), 'deskripsi': str(key['deskripsi']),'sekolah_domain':str(domain)})
 
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
                     fut = [exec.submit(ambilData_activityuser, key) for key in resp_json_activityuser['activities']]
+
 
                 urlActivityuser = "https://api.seonindonesia.net/activity_user/create"
                 headersPython = CaseInsensitiveDict()
@@ -100,7 +102,7 @@ for key in datas:
                                                'tb_reff': key['tb_reff'], 'id_user': key['id_user'],
                                                'fullname': key['fullname'], 'foto_profile': key['foto_profile'],
                                                'cover': key['cover'], 'level_user': key['level_user'],
-                                               'deskripsi': key['deskripsi']}
+                                               'deskripsi': key['deskripsi'],'sekolah_domain':key['sekolah_domain']}
                     tambahdatas_activityuser = str(TambahData_activityuser).replace("'", '"')
                     resp = requests.post(urlActivityuser, headers=headersPython, data=tambahdatas_activityuser)
 
@@ -116,7 +118,7 @@ for key in datas:
                         error = str(e).replace("'", "")
                         log_scheduler_global = {"domain": key['sekolah_domain'],
                                                 "kode_scheduler": "scraping activity user data", "record_time": today,
-                                                "status": "sucess", "error_message": error[:200]}
+                                                "status": "failed", "error_message": error[:200]}
                         log_scheduler_global = str(log_scheduler_global).replace("'", '"')
                         resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
             else:
