@@ -77,15 +77,15 @@ for key in datas:
 
                 def ambilData_modul(key):
                     datas_modul.append(
-                        {'subject_id': key['subject_id'], 'name': key['name'], 'id_schedule': key['id_schedule'],
-                         'guru': key['guru'], 'id_modul': key['id'], 'title': key['title'],
-                         'description': key['description'], 'file_name': key['file_name'],
-                         'extension': key['extension'], 'tipe_modul': key['tipe_modul'],
-                         'id_subject': key['id_subject'], 'id_guru': key['id_guru'], 'id_class': key['id_class'],
-                         'id_jadwal_pelajaran': key['id_jadwal_pelajaran'], 'link': key['link'], 'cover': key['cover'],
-                         'upload': key['upload'], 'tipe_link': key['tipe_link'], 'deleted': key['deleted'],
-                         'type': key['type'], 'created_at': key['created_at'], 'cover_path': key['cover_path'],
-                         'file_path': key['file_path'], 'subject_name': key['subject_name']})
+                        {'subject_id': str(key['subject_id']), 'name': str(key['name']), 'id_schedule': str(key['id_schedule']),
+                         'guru': str(key['guru']), 'id_modul': str(key['id']), 'title': str(key['title']),
+                         'description': str(key['description']), 'file_name': str(key['file_name']),
+                         'extension': str(key['extension']), 'tipe_modul': str(key['tipe_modul']),
+                         'id_subject': str(key['id_subject']), 'id_guru': str(key['id_guru']), 'id_class': str(key['id_class']),
+                         'id_jadwal_pelajaran': str(key['id_jadwal_pelajaran']), 'link': str(key['link']), 'cover': str(key['cover']),
+                         'upload': str(key['upload']), 'tipe_link': str(key['tipe_link']), 'deleted': str(key['deleted']),
+                         'type': str(key['type']), 'created_at': str(key['created_at']), 'cover_path': str(key['cover_path']),
+                         'file_path': str(key['file_path']), 'subject_name': str(key['subject_name'])})
 
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
@@ -144,7 +144,7 @@ for key in datas:
                         error = str(e).replace("'", "")
                         log_scheduler_global = {"domain": key['sekolah_domain'],
                                                 "kode_scheduler": "scraping modul data", "record_time": today,
-                                                "status": "sucess", "error_message": error[:200]}
+                                                "status": "failed", "error_message": error[:200]}
                         log_scheduler_global = str(log_scheduler_global).replace("'", '"')
                         resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
             else:

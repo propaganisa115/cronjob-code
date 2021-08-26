@@ -49,6 +49,8 @@ yesterday = (datetime.now() - timedelta(1)).strftime('%Y-%m-%d')
 filter = {"start_date": yesterday, "end_date": yesterday}
 filter = str(filter).replace("'", '"')
 
+print(filter)
+
 yesterdayOnlydate = (datetime.now().date() - timedelta(1)).strftime('%Y-%m-%d')
 filterOnlydate = {"date": yesterdayOnlydate}
 filterOnlydate = str(filterOnlydate).replace("'", '"')

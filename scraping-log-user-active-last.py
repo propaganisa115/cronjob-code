@@ -35,8 +35,7 @@ with ThreadPoolExecutor(max_workers=None) as exec:
     fut = [exec.submit(ambilData, key) for key in resp]
 
 headersClient = CaseInsensitiveDict()
-headersClient[
-    "Authorization"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiU0VPTkFETTAwMSIsImZ1bGxuYW1lIjoiU2VvbiBBZG1pbiIsImVtYWlsIjoic2VvbmFkbWluQHNlb24uY29tIiwidHlwZSI6InN1cGVyX2FkbWluIiwiQVBJX1RJTUUiOjE2MjcwMjM3Mzl9.4HiC4XnwiQ6CpfpCg_IVqVQeLr0pwqT-pIEjRPb6dvQ"
+headersClient["Authorization"] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiU0VPTkFETTAwMSIsImZ1bGxuYW1lIjoiU2VvbiBBZG1pbiIsImVtYWlsIjoic2VvbmFkbWluQHNlb24uY29tIiwidHlwZSI6InN1cGVyX2FkbWluIiwiQVBJX1RJTUUiOjE2MjcwMjM3Mzl9.4HiC4XnwiQ6CpfpCg_IVqVQeLr0pwqT-pIEjRPb6dvQ"
 headersClient["Content-Type"] = "application/json"
 headersClient["Content-Length"] = "0"
 
@@ -57,71 +56,82 @@ filterOnlydate = str(filterOnlydate).replace("'", '"')
 today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 for key in datas:
-    urlSeonpoint = "https://" + str(key['sekolah_domain']) + "/api/main/seonpoint"
+    urlActivity_user = "https://" + str(key['sekolah_domain']) + "/api/main/activity_last"
     if len(str(key['sekolah_domain'])) < 0:
-        log_scheduler_global = {"domain": "empty", "kode_scheduler": "scraping seonpoint data", "record_time": today,
+        log_scheduler_global = {"domain": "empty", "kode_scheduler": "scraping log data of last active user", "record_time": today,
                                 "status": "failed", "error_message": "sekolah_domain is empty with id school " + str(
                 key['id']) + ", you can check in the table sekolah"}
         log_scheduler_global = str(log_scheduler_global).replace("'", '"')
         resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
     else:
         try:
-            respClient = requests.post(urlSeonpoint, headers=headersClient, data=filter)
-            if (respClient.status_code == 200):
-                resp_json = json.loads(respClient.text)
-                data_seon_point = []
+            resp_json_activityuser = requests.post(urlActivity_user, headers=headersClient)
+            if (resp_json_activityuser.status_code == 200):
+                resp_json_activityuser = json.loads(resp_json_activityuser.text)
+                datas_activityuser = []
 
+                domain=resp_json_activityuser['sekolah']
 
-                def ambilData(key):
-                    data_seon_point.append({'id': str(key['id']), 'id_user': str(key['id_user']), 'type_user': str(key['type_user']),
-                                            'action': str(key['action']), 'point': str(key['point']),
-                                            'keterangan': str(key['keterangan']), 'record_time': str(key['record_time'])})
+                def ambilData_activityuser(key):
+                    datas_activityuser.append(
+                        {'id_activity': str(key['id_activity']), 'tipe_user': str(key['tipe_user']), 'user_id': str(key['user_id']),
+                         'aktivitas': str(key['aktivitas']), 'id_ref_activity': str(key['id_ref_activity']),
+                         'id_jadwal_pelajaran': str(key['id_jadwal_pelajaran']), 'datetime': str(key['datetime']),
+                         'type_activity': str(key['type_activity']), 'tb_reff': str(key['tb_reff']),'created_at': str(key['created_at']), 'id_user': str(key['id_user']),
+                         'fullname': str(key['fullname']), 'foto_profile': str(key['foto_profile']), 'cover': str(key['cover']),
+                         'level_user': str(key['level_user']), 'deskripsi': str(key['deskripsi']),'sekolah_domain':str(domain),'record_time':today})
 
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
-                    fut = [exec.submit(ambilData, key) for key in resp_json['data']]
+                    fut = [exec.submit(ambilData_activityuser, key) for key in resp_json_activityuser['activities']]
 
-                urlSeon = "https://api.seonindonesia.net/seon_point/create"
+
+                urlActivityuser = "https://api.seonindonesia.net/activity_user_last/create"
                 headersPython = CaseInsensitiveDict()
                 headersPython["Accept"] = "application/json"
                 headersPython["Authorization"] = "Basic YW5pc2E6YW5pc2E="
                 headersPython["Content-Type"] = "application/json"
 
 
-                def tambahData(key):
-                    TambahData = {"id_seon": key['id'], "id_user": key['id_user'], "type_user": key['type_user'],
-                                  "action": key['action'], "point": key['point'], "keterangan": key['keterangan'],
-                                  "record_time": key['record_time']}
-                    tambahdatas = str(TambahData).replace("'", '"')
-                    resp = requests.post(urlSeon, headers=headersPython, data=tambahdatas)
-
+                def tambahData_activityuser(key):
+                    TambahData_activityuser = {'id_activity': key['id_activity'], 'tipe_user': key['tipe_user'],
+                                               'user_id': key['user_id'], 'aktivitas': key['aktivitas'],
+                                               'id_ref_activity': key['id_ref_activity'],
+                                               'id_jadwal_pelajaran': key['id_jadwal_pelajaran'],
+                                               'datetime': key['datetime'], 'type_activity': key['type_activity'],
+                                               'tb_reff': key['tb_reff'], 'id_user': key['id_user'], 'created_at': key['created_at'],
+                                               'fullname': key['fullname'], 'foto_profile': key['foto_profile'],
+                                               'cover': key['cover'], 'level_user': key['level_user'],
+                                               'deskripsi': key['deskripsi'],'sekolah_domain':key['sekolah_domain'],'record_time':today}
+                    tambahdatas_activityuser = str(TambahData_activityuser).replace("'", '"')
+                    resp = requests.post(urlActivityuser, headers=headersPython, data=tambahdatas_activityuser)
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
                     try:
-                        futures = [exec.submit(tambahData, key) for key in data_seon_point]
+                        futures = [exec.submit(tambahData_activityuser, key) for key in datas_activityuser]
                         log_scheduler_global = {"domain": key['sekolah_domain'],
-                                                "kode_scheduler": "scraping seonpoint data", "record_time": today,
+                                                "kode_scheduler": "scraping log data of last active user", "record_time": today,
                                                 "status": "success", "error_message": ""}
                         log_scheduler_global = str(log_scheduler_global).replace("'", '"')
                         resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
                     except Exception as e:
                         error = str(e).replace("'", "")
                         log_scheduler_global = {"domain": key['sekolah_domain'],
-                                                "kode_scheduler": "scraping seonpoint data", "record_time": today,
+                                                "kode_scheduler": "scraping log data of last active user", "record_time": today,
                                                 "status": "failed", "error_message": error[:200]}
                         log_scheduler_global = str(log_scheduler_global).replace("'", '"')
                         resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
             else:
                 log_scheduler_global = {"domain": str(key['sekolah_domain']),
-                                        "kode_scheduler": "scraping seonpoint data", "record_time": today,
+                                        "kode_scheduler": "scraping log data of last active user", "record_time": today,
                                         "status": "failed",
                                         "error_message": "response return http error with status code " + str(
-                                            respClient.status_code)}
+                                            resp_json_activityuser.status_code)}
                 log_scheduler_global = str(log_scheduler_global).replace("'", '"')
                 resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
         except Exception as e:
             error = str(e).replace("'", "")
-            log_scheduler_global = {"domain": str(key['sekolah_domain']), "kode_scheduler": "scraping seonpoint data",
+            log_scheduler_global = {"domain": str(key['sekolah_domain']), "kode_scheduler": "scraping log data of last active user",
                                     "record_time": today, "status": "failed", "error_message": error[:200]}
             log_scheduler_global = str(log_scheduler_global).replace("'", '"')
             resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)

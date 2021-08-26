@@ -75,8 +75,8 @@ for key in datas:
                 datas_loguseractive = []
 
                 def ambilData_loguseractive(key):
-                    datas_loguseractive.append({'users_active': key['users_active'], 'sekolah': key['sekolah'],
-                                                'token_sekolah': key['token_sekolah']})
+                    datas_loguseractive.append({'users_active': str(key['users_active']), 'sekolah': str(key['sekolah']),
+                                                'token_sekolah': str(key['token_sekolah'])})
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
                     fut = [exec.submit(ambilData_loguseractive, key) for key in resp_json_loguseractive['data']]
@@ -106,7 +106,7 @@ for key in datas:
                         error = str(e).replace("'", "")
                         log_scheduler_global = {"domain": key['sekolah_domain'],
                                                 "kode_scheduler": "scraping log user active data", "record_time": today,
-                                                "status": "sucess", "error_message": error[:200]}
+                                                "status": "failed", "error_message": error[:200]}
                         log_scheduler_global = str(log_scheduler_global).replace("'", '"')
                         resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
             else:
