@@ -12,7 +12,6 @@ import collections
 from google.cloud import storage
 import math
 
-
 url = "http://api.seonindonesia.net/sekolah"
 urlLog = "http://api.seonindonesia.net/log_scheduler/create"
 
@@ -58,30 +57,30 @@ filterOnlydate = str(filterOnlydate).replace("'", '"')
 today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 for key in datas:
-    keydomain=key['sekolah_domain']
-    urlStorage = "https://" + str(key['sekolah_domain']) + "/api/main/storageinfo"
+    urluseronline = "https://" + str(key['sekolah_domain']) + "/api/main/useronline/day"
     if len(str(key['sekolah_domain'])) < 0:
-        log_scheduler_global = {"domain": "empty", "kode_scheduler": "scraping total active storage per school data", "record_time": today,
+        log_scheduler_global = {"domain": "empty", "kode_scheduler": "scraping number of online user per school data", "record_time": today,
                                 "status": "failed", "error_message": "sekolah_domain is empty with id school " + str(
                 key['id']) + ", you can check in the table sekolah"}
         log_scheduler_global = str(log_scheduler_global).replace("'", '"')
-        resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
+        resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2)
     else:
         try:
-            respClient = requests.get(urlStorage, headers=headersClient)
+            respClient = requests.get(urluseronline, headers=headersClient)
 
             if (respClient.status_code == 200):
 
                 resp_json = json.loads(respClient.text)
-
+                for c in resp_json['data']:
+                    user_online=c['user_online']
                 domain=resp_json['sekolah']
-                data = resp_json['data']
-                data_storage=[]
-                for key in data:
-                    data_storage.append({'kapasitas': key['kapasitas'],'bonus': key['bonus'], 'sekolah_domain': str(domain),'record_time': today})
+                data_user_online=[]
+
+                data_user_online.append({'user_online': user_online, 'sekolah_domain': str(domain),'record_time': today})
 
 
-                urlSeon = "https://api.seonindonesia.net/total_storage_persekolah/create"
+
+                urlSeon = "https://api.seonindonesia.net/jumlah_user_online_harian/create"
                 headersPython = CaseInsensitiveDict()
                 headersPython["Accept"] = "application/json"
                 headersPython["Authorization"] = "Basic YW5pc2E6YW5pc2E="
@@ -89,29 +88,29 @@ for key in datas:
 
 
                 def tambahData(key):
-                    TambahData = {"kapasitas": key['kapasitas'],"bonus": key['bonus'], "sekolah_domain": key['sekolah_domain'], "record_time": today}
+                    TambahData = {"user_online": key['user_online'], "sekolah_domain": key['sekolah_domain'], "record_time": key['record_time']}
                     tambahdatas = str(TambahData).replace("'", '"')
                     resp = requests.post(urlSeon, headers=headersPython, data=tambahdatas)
 
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
                     try:
-                        futures = [exec.submit(tambahData, key) for key in data_storage]
-                        log_scheduler_global = {"domain": keydomain,
-                                                "kode_scheduler": "scraping total active storage per school data", "record_time": today,
+                        futures = [exec.submit(tambahData, key) for key in data_user_online]
+                        log_scheduler_global = {"domain": key['sekolah_domain'],
+                                                "kode_scheduler": "scraping number of online user per school data", "record_time": today,
                                                 "status": "success", "error_message": ""}
                         log_scheduler_global = str(log_scheduler_global).replace("'", '"')
                         resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
                     except Exception as e:
                         error = str(e).replace("'", "")
-                        log_scheduler_global = {"domain": keydomain,
-                                                "kode_scheduler": "scraping total active storage per school data", "record_time": today,
+                        log_scheduler_global = {"domain": key['sekolah_domain'],
+                                                "kode_scheduler": "scraping number of online user per school data", "record_time": today,
                                                 "status": "failed", "error_message": error[:200]}
                         log_scheduler_global = str(log_scheduler_global).replace("'", '"')
                         resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
             else:
-                log_scheduler_global = {"domain": keydomain,
-                                        "kode_scheduler": "scraping total active storage per school data", "record_time": today,
+                log_scheduler_global = {"domain": str(key['sekolah_domain']),
+                                        "kode_scheduler": "scraping number of online user per school data", "record_time": today,
                                         "status": "failed",
                                         "error_message": "response return http error with status code " + str(
                                             respClient.status_code)}
@@ -119,7 +118,7 @@ for key in datas:
                 resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)
         except Exception as e:
             error = str(e).replace("'", "")
-            log_scheduler_global = {"domain": keydomain, "kode_scheduler": "scraping total active storage per school data",
+            log_scheduler_global = {"domain": str(key['sekolah_domain']), "kode_scheduler": "scraping number of online user per school data",
                                     "record_time": today, "status": "failed", "error_message": error[:200]}
             log_scheduler_global = str(log_scheduler_global).replace("'", '"')
             resp = requests.post(urlLogSchedulerGlobal, headers=headersPython2, data=log_scheduler_global)

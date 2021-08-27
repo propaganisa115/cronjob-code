@@ -85,7 +85,8 @@ for key in datas:
                 with ThreadPoolExecutor(max_workers=None) as exec:
                     fut = [exec.submit(ambilData_activityuser, key) for key in resp_json_activityuser['activities']]
 
-
+                print(datas_activityuser)
+                
                 urlActivityuser = "https://api.seonindonesia.net/activity_user_last/create"
                 headersPython = CaseInsensitiveDict()
                 headersPython["Accept"] = "application/json"
