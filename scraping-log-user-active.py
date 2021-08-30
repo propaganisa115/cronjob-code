@@ -76,7 +76,7 @@ for key in datas:
 
                 def ambilData_loguseractive(key):
                     datas_loguseractive.append({'users_active': str(key['users_active']), 'sekolah': str(key['sekolah']),
-                                                'token_sekolah': str(key['token_sekolah'])})
+                                                'token_sekolah': str(key['token_sekolah']),'record_time':str(today)})
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
                     fut = [exec.submit(ambilData_loguseractive, key) for key in resp_json_loguseractive['data']]
@@ -90,7 +90,7 @@ for key in datas:
 
                 def tambahData_loguseractive(key):
                     TambahData_loguseractive = {'users_active': key['users_active'], 'sekolah': key['sekolah'],
-                                                'token_sekolah': key['token_sekolah']}
+                                                'token_sekolah': key['token_sekolah'],'record_time': key['record_time']}
                     tambahdatas_loguseractive = str(TambahData_loguseractive).replace("'", '"')
                     resp = requests.post(urlLoguseractive, headers=headersPython, data=tambahdatas_loguseractive)
 
