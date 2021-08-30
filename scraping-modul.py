@@ -69,27 +69,26 @@ for key in datas:
             if (resp_json_modul.status_code == 200):
                 resp_json_modul = json.loads(resp_json_modul.text)
 
-                if type(resp_json_modul['data'] == "<class 'dict'>"):
-                    resp_json_modul['data'] = [resp_json_modul['data']]
 
                 datas_modul = []
-
-
+                domain = resp_json_modul['sekolah']
                 def ambilData_modul(key):
+
                     datas_modul.append(
-                        {'subject_id': str(key['subject_id']), 'name': str(key['name']), 'id_schedule': str(key['id_schedule']),
+                        {'subject_id': key['subject_id'], 'name': str(key['name']), 'id_schedule': str(key['id_schedule']),
                          'guru': str(key['guru']), 'id_modul': str(key['id']), 'title': str(key['title']),
                          'description': str(key['description']), 'file_name': str(key['file_name']),
                          'extension': str(key['extension']), 'tipe_modul': str(key['tipe_modul']),
                          'id_subject': str(key['id_subject']), 'id_guru': str(key['id_guru']), 'id_class': str(key['id_class']),
                          'id_jadwal_pelajaran': str(key['id_jadwal_pelajaran']), 'link': str(key['link']), 'cover': str(key['cover']),
                          'upload': str(key['upload']), 'tipe_link': str(key['tipe_link']), 'deleted': str(key['deleted']),
-                         'type': str(key['type']), 'created_at': str(key['created_at']), 'cover_path': str(key['cover_path']),
-                         'file_path': str(key['file_path']), 'subject_name': str(key['subject_name'])})
+                         'type': str(key['type']), 'created_at': str(today), 'cover_path': str(key['cover_path']),
+                         'file_path': str(key['file_path']), 'subject_name': str(key['subject_name']),'sekolah_domain':str(domain)})
 
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
                     fut = [exec.submit(ambilData_modul, key) for key in resp_json_modul['data']]
+
 
                 urlModul = "https://api.seonindonesia.net/modul/create"
                 headersPython = CaseInsensitiveDict()
@@ -128,7 +127,7 @@ for key in datas:
                                         'tipe_link': key['tipe_link'], 'deleted': key['deleted'], 'type': key['type'],
                                         'created_at': key['created_at'], 'cover_path': key['cover_path'],
                                         'file_path': key['file_path'], 'subject_name': key['subject_name'],
-                                        'share': 'off'}
+                                        'share': 'off','sekolah_domain':key['sekolah_domain'],'created_at':key['created_at']}
                     tambahdatas_modul = str(TambahData_modul).replace("'", '"')
                     resp = requests.post(urlModul, headers=headersPython, data=tambahdatas_modul)
 
