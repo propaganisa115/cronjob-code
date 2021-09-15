@@ -57,7 +57,7 @@ filterOnlydate = str(filterOnlydate).replace("'", '"')
 today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 for key in datas:
-    urltopupstorage = "https://" + str(key['sekolah_domain']) + "/api/main/storage/filter"
+    urltopupstorage = "https://" + str(key['sekolah_domain']) + "/api/main/storage/today"
     if len(str(key['sekolah_domain'])) < 0:
         log_scheduler_global = {"domain": "empty", "kode_scheduler": "scraping request of topup storage data", "record_time": today,
                                 "status": "failed", "error_message": "sekolah_domain is empty with id school " + str(
