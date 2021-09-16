@@ -57,7 +57,7 @@ filterOnlydate = str(filterOnlydate).replace("'", '"')
 today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 for key in datas:
-    urltopupstorage = "https://" + str(key['sekolah_domain']) + "/api/main/storage/today"
+    urltopupstorage = "https://" + str(key['sekolah_domain']) + "/api/main/storage"
     if len(str(key['sekolah_domain'])) < 0:
         log_scheduler_global = {"domain": "empty", "kode_scheduler": "scraping request of topup storage data", "record_time": today,
                                 "status": "failed", "error_message": "sekolah_domain is empty with id school " + str(
@@ -93,7 +93,7 @@ for key in datas:
                 with ThreadPoolExecutor(max_workers=None) as exec:
                     fut = [exec.submit(ambilData, key) for key in resp_json['list_storage']]
 
-                print(data_topup_storage)
+                #print(data_topup_storage)
 
                 urlTopup = "https://api.seonindonesia.net/tb_topup_storage/create"
                 headersPython = CaseInsensitiveDict()
@@ -109,9 +109,18 @@ for key in datas:
                                   , "time_aktif": key['time_aktif'], "status_diskon": key['status_diskon']
                                   ,"created_at_client": key['created_at'],"created_at_server": str(today)}
                     tambahdatas = str(TambahData).replace("'", '"')
-                    print(tambahdatas)
+                    #print(tambahdatas)
                     resp = requests.post(urlTopup, headers=headersPython, data=tambahdatas)
-                    print(resp)
+                    update = {"id":[key['id']]}
+                    update = str(update).replace("'", '"')
+                    print(update)
+                    try:
+                        respClient = requests.put(urltopupstorage, headers=headersClient,data=update)
+                        print(respClient)
+                    except Exception as e:
+                        error = str(e).replace("'", "")
+                        print(error)
+                    #print(resp)
 
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
