@@ -104,9 +104,18 @@ for key in datas:
                                   "updated_at": key['updated_at'], "estimated_time": key['estimated_time'], "link_backup": key['link_backup']
                                   ,"created_at_server": str(today)}
                     tambahdatas = str(TambahData).replace("'", '"')
-                    print(tambahdatas)
+                    #print(tambahdatas)
                     resp = requests.post(urlbncserver, headers=headersPython, data=tambahdatas)
-                    print(resp)
+                    update = {"id": [key['id']]}
+                    update = str(update).replace("'", '"')
+                    print(update)
+                    try:
+                        respClient = requests.put(urlbnc, headers=headersClient, data=update)
+                        print(respClient)
+                    except Exception as e:
+                        error = str(e).replace("'", "")
+                        print(error)
+                    # print(resp)
 
 
                 with ThreadPoolExecutor(max_workers=None) as exec:
